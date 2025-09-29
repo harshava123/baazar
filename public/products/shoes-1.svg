@@ -1,0 +1,7 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#374151"/>
+  <path d="M40 120 Q60 100 80 120 Q100 140 120 120 Q140 100 160 120 L160 140 Q140 160 120 140 Q100 160 80 140 Q60 160 40 140 Z" fill="#6B7280" stroke="#9CA3AF" stroke-width="2"/>
+  <path d="M80 120 L120 120" stroke="#9CA3AF" stroke-width="1"/>
+  <path d="M70 130 L130 130" stroke="#9CA3AF" stroke-width="1"/>
+  <text x="100" y="180" text-anchor="middle" fill="#9CA3AF" font-size="12">Shoes</text>
+</svg> 

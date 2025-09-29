@@ -1,0 +1,12 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#374151"/>
+  <rect x="40" y="80" width="120" height="40" fill="#6B7280" stroke="#9CA3AF" stroke-width="2" rx="4"/>
+  <rect x="50" y="90" width="8" height="8" fill="#9CA3AF"/>
+  <rect x="65" y="90" width="8" height="8" fill="#9CA3AF"/>
+  <rect x="80" y="90" width="8" height="8" fill="#9CA3AF"/>
+  <rect x="95" y="90" width="8" height="8" fill="#9CA3AF"/>
+  <rect x="110" y="90" width="8" height="8" fill="#9CA3AF"/>
+  <rect x="125" y="90" width="8" height="8" fill="#9CA3AF"/>
+  <rect x="140" y="90" width="8" height="8" fill="#9CA3AF"/>
+  <text x="100" y="180" text-anchor="middle" fill="#9CA3AF" font-size="12">Keyboard</text>
+</svg> 

@@ -1,0 +1,10 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#374151"/>
+  <path d="M60 40 L100 20 L140 40 L140 160 L60 160 Z" fill="#6B7280" stroke="#9CA3AF" stroke-width="2"/>
+  <path d="M60 60 L140 60" stroke="#9CA3AF" stroke-width="1"/>
+  <path d="M60 80 L140 80" stroke="#9CA3AF" stroke-width="1"/>
+  <path d="M60 100 L140 100" stroke="#9CA3AF" stroke-width="1"/>
+  <path d="M60 120 L140 120" stroke="#9CA3AF" stroke-width="1"/>
+  <path d="M60 140 L140 140" stroke="#9CA3AF" stroke-width="1"/>
+  <text x="100" y="180" text-anchor="middle" fill="#9CA3AF" font-size="12">Dress</text>
+</svg> 

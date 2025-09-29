@@ -1,0 +1,9 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#374151"/>
+  <rect x="60" y="60" width="80" height="100" fill="#6B7280" stroke="#9CA3AF" stroke-width="2" rx="4"/>
+  <path d="M70 60 L90 40 L110 40 L130 60" stroke="#9CA3AF" stroke-width="2" fill="none"/>
+  <rect x="70" y="80" width="60" height="4" fill="#9CA3AF"/>
+  <rect x="70" y="100" width="60" height="4" fill="#9CA3AF"/>
+  <rect x="70" y="120" width="60" height="4" fill="#9CA3AF"/>
+  <text x="100" y="180" text-anchor="middle" fill="#9CA3AF" font-size="12">Backpack</text>
+</svg> 
