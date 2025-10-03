@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { memo, useState, useEffect } from 'react';
 import { products } from '@/data';
 import { apiClient } from '@/lib/api';
+// import { ProductCategory, BackendCategory } from '@/types';
 
 const CategoriesScrollSection = memo(() => {
   const [productNames, setProductNames] = useState<string[]>([]);

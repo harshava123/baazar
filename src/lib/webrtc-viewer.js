@@ -116,14 +116,14 @@ class WebRTCViewer {
       });
 
       this.socket.on('webrtc-answer', (data) => {
-        const { answer, fromId } = data;
+        const { answer } = data;
         if (this.peer) {
           this.peer.signal(answer);
         }
       });
 
       this.socket.on('webrtc-ice-candidate', (data) => {
-        const { candidate, fromId } = data;
+        const { candidate } = data;
         if (this.peer) {
           this.peer.signal(candidate);
         }

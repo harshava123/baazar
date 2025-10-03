@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Eye, Heart, Sparkles, Gem, Gift, Users, Play } from "lucide-react";
-import { FadeIn, StaggeredFadeIn } from "@/components/animations";
+import { Eye, Sparkles, Gem, Gift, Users, Play } from "lucide-react";
 import { apiClient } from '@/lib/api';
 import { wsClient } from '@/lib/websocket';
 import WebRTCViewer from '@/lib/webrtc-viewer';
@@ -82,7 +81,7 @@ export default function LivestreamSectionIntegrated() {
       wsClient.connect(token);
       
       // Listen for stream updates
-      wsClient.onStreamStats((stats) => {
+      wsClient.onStreamStats((stats: any) => {
         setLivestreams(prev => prev.map(stream => 
           stream.id === stats.streamId 
             ? { ...stream, viewers: stats.viewerCount }
@@ -91,7 +90,7 @@ export default function LivestreamSectionIntegrated() {
       });
 
       // Listen for chat messages
-      wsClient.onStreamChatMessage((message) => {
+      wsClient.onStreamChatMessage((message: any) => {
         setLivestreams(prev => prev.map(stream => {
           if (stream.id === message.streamId) {
             return {
@@ -123,7 +122,7 @@ export default function LivestreamSectionIntegrated() {
       await viewer.initialize();
       
       // Set up callbacks
-      viewer.setOnStream((stream) => {
+      viewer.setOnStream((stream: any) => {
         setWebrtcStream(stream);
       });
       
@@ -131,7 +130,7 @@ export default function LivestreamSectionIntegrated() {
         setWebrtcStream(null);
       });
       
-      viewer.setOnViewerCount((count) => {
+      viewer.setOnViewerCount((count: any) => {
         // Update viewer count in real-time
         setLivestreams(prev => prev.map(stream => ({
           ...stream,
@@ -139,7 +138,7 @@ export default function LivestreamSectionIntegrated() {
         })));
       });
       
-      setWebrtcViewer(viewer);
+      setWebrtcViewer(viewer as any);
     };
     
     initializeWebRTC();
@@ -150,7 +149,7 @@ export default function LivestreamSectionIntegrated() {
     return () => {
       clearInterval(interval);
       if (webrtcViewer) {
-        webrtcViewer.disconnect();
+        (webrtcViewer as any).disconnect();
       }
     };
   }, []);
@@ -162,7 +161,7 @@ export default function LivestreamSectionIntegrated() {
       
       // Join WebRTC stream
       if (webrtcViewer) {
-        await webrtcViewer.joinStream(stream.id);
+        await (webrtcViewer as any).joinStream(stream.id);
       }
     } else {
       console.log('Stream is not live yet');

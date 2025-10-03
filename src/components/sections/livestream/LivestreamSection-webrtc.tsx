@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Eye, Heart, Sparkles, Gem, Gift, Users, Play, Camera, Mic } from "lucide-react";
+import { Eye, Heart, Sparkles, Gem, Gift, Users, Play, Camera } from "lucide-react";
 import { FadeIn, StaggeredFadeIn } from "@/components/animations";
 import { apiClient } from '@/lib/api';
 import WebRTCViewer from '@/lib/webrtc-viewer';
@@ -95,7 +95,7 @@ export default function LivestreamSectionWebRTC() {
       await viewer.initialize();
       
       // Set up event handlers
-      viewer.setOnStream((stream) => {
+      viewer.setOnStream((stream: any) => {
         console.log('🎥 Received WebRTC stream!');
         setWebrtcStream(stream);
         setIsConnecting(false);
@@ -108,7 +108,7 @@ export default function LivestreamSectionWebRTC() {
         setIsConnecting(false);
       });
       
-      viewer.setOnError((error) => {
+      viewer.setOnError((error: any) => {
         console.error('❌ WebRTC error:', error);
         setConnectionError(error);
         setIsConnecting(false);
@@ -116,7 +116,7 @@ export default function LivestreamSectionWebRTC() {
       
       setWebrtcViewer(viewer);
     } catch (error) {
-      console.error('Failed to initialize WebRTC viewer:', error);
+      console.error('Failed to initialize WebRTC viewer:', error as any);
       setConnectionError('Failed to initialize WebRTC viewer');
     }
   };
@@ -175,7 +175,7 @@ export default function LivestreamSectionWebRTC() {
       }
     } catch (error) {
       console.error('Failed to join stream:', error);
-      setConnectionError('Failed to join WebRTC stream: ' + error.message);
+      setConnectionError('Failed to join WebRTC stream: ' + (error as any).message);
       setIsConnecting(false);
     }
   };

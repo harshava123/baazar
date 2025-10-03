@@ -6,6 +6,7 @@ import { use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api';
+import { BackendCategory, BackendProduct } from '@/types';
 
 
 // Static product data for demonstration
@@ -403,7 +404,7 @@ const CategoryPage = memo(({ params }: CategoryPageProps) => {
     }
   }
   
-  const [realProducts, setRealProducts] = useState<any[]>([]);
+  const [realProducts, setRealProducts] = useState<BackendProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoryName, setCategoryName] = useState<string>(category?.title || '');
   
@@ -415,7 +416,7 @@ const CategoryPage = memo(({ params }: CategoryPageProps) => {
         const categoriesResult = await apiClient.getCategories();
         if (categoriesResult.success && categoriesResult.data) {
           // Find category by name matching slug (case-insensitive, with various formats)
-          const matchedCategory = categoriesResult.data.find((cat: any) => {
+          const matchedCategory = categoriesResult.data.find((cat: BackendCategory) => {
             const catNameSlug = cat.name.toLowerCase().replace(/\s+/g, '-');
             const catNameSpaced = cat.name.toLowerCase();
             const paramSlug = resolvedParams.slug.toLowerCase();

@@ -200,4 +200,51 @@ export interface Cart {
   subtotal: number
   tax: number
   shipping: number
+}
+
+// Backend API Types
+export interface BackendCategory {
+  id: string
+  name: string
+  image?: string
+  description?: string
+}
+
+export interface BackendProduct {
+  id: string
+  name: string
+  price: number
+  discount_price?: number
+  discount_percentage?: number
+  images?: string[]
+  description?: string
+  categories?: {
+    id: string
+    name: string
+  }
+  category_id?: string
+  sizes?: string[]
+  colors?: string[]
+  rating?: number
+  review_count?: number
+  stock?: number
+  is_featured?: boolean
+  slug?: string
+}
+
+export interface LivestreamCard {
+  id: string
+  title: string
+  thumbnail: string
+  streamer: {
+    name: string
+    image: string
+  }
+  isLive: boolean
+  viewers: number
+  comments: Array<{
+    id: string
+    username: string
+    message: string
+  }>
 } 

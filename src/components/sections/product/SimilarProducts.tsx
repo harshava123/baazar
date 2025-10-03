@@ -6,6 +6,7 @@ import { Star, Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api';
+import { Product, BackendProduct } from '@/types';
 
 interface SimilarProductsProps {
   categoryId?: string;
@@ -14,7 +15,7 @@ interface SimilarProductsProps {
 }
 
 const SimilarProducts = ({ categoryId, categoryName, currentProductId }: SimilarProductsProps) => {
-  const [similarProducts, setSimilarProducts] = useState<any[]>([]);
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

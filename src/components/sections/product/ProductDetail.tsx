@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api';
+import { BackendProduct } from '@/types';
 import ProductImages from './ProductImages';
 import ProductInfo from './ProductInfo';
 import SimilarProducts from './SimilarProducts';
@@ -15,7 +16,7 @@ interface ProductDetailProps {
 
 const ProductDetail = ({ productId }: ProductDetailProps) => {
   const router = useRouter();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<BackendProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');

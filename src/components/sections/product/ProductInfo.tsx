@@ -5,9 +5,10 @@ import { motion } from 'framer-motion';
 import { Star, Minus, Plus, Check } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useRouter } from 'next/navigation';
+import { BackendProduct } from '@/types';
 
 interface ProductInfoProps {
-  product: any;
+  product: BackendProduct;
   selectedSize: string;
   setSelectedSize: (size: string) => void;
   selectedColor: string;

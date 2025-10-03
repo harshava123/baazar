@@ -9,6 +9,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
 import { apiClient } from '@/lib/api';
+import { Product, BackendProduct } from '@/types';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -17,9 +18,9 @@ import 'swiper/css/pagination';
 
 const BestSellingSection = memo(() => {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -29,7 +30,7 @@ const BestSellingSection = memo(() => {
         
         if (response.success && response.data) {
           // Transform backend products to match frontend format
-          const transformedProducts = response.data.map((product: any) => ({
+          const transformedProducts = response.data.map((product: BackendProduct) => ({
             id: product.id,
             name: product.name,
             price: product.price,
@@ -37,7 +38,7 @@ const BestSellingSection = memo(() => {
             category: {
               id: product.categories?.id || '1',
               name: product.categories?.name || 'General',
-              slug: product.categories?.slug || 'general'
+              slug: product.slug || 'general'
             },
             isNew: false,
             isFeatured: product.is_featured || false,

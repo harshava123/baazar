@@ -6,9 +6,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { apiClient } from '@/lib/api';
+import { ProductCategory, BackendCategory } from '@/types';
 
 interface CategoryCardProps {
-  category: { name: string; image: string };
+  category: ProductCategory;
 }
 
 const CategoryCard = memo(({ category }: CategoryCardProps) => {
@@ -23,8 +24,8 @@ const CategoryCard = memo(({ category }: CategoryCardProps) => {
       <div className="relative w-full h-[280px] sm:h-[320px] md:h-[380px] lg:h-[450px] xl:h-[500px] bg-gray-900 rounded-t-[60px] sm:rounded-t-[80px] md:rounded-t-[120px] lg:rounded-t-[160px] overflow-hidden" style={{ maxWidth: '100%' }}>
         {/* Background Image */}
         <div className="absolute inset-0">
-          <Image
-            src={category.image}
+        <Image
+          src={category.image || 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop&crop=center'}
             alt={category.name}
             fill
             className="object-cover"
@@ -97,7 +98,7 @@ const CategoryCard = memo(({ category }: CategoryCardProps) => {
 CategoryCard.displayName = 'CategoryCard';
 
 const AllCategoriesPage = memo(() => {
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -113,7 +114,7 @@ const AllCategoriesPage = memo(() => {
         
         if (response && response.success && response.data && response.data.length > 0) {
           // Transform backend categories to match frontend format
-          const transformedCategories = response.data.map((category: any) => ({
+          const transformedCategories = response.data.map((category: BackendCategory) => ({
             name: category.name.toUpperCase(),
             image: category.image || 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop&crop=center',
             slug: category.name.toLowerCase().replace(/\s+/g, '-'),
@@ -125,16 +126,16 @@ const AllCategoriesPage = memo(() => {
         } else {
           throw new Error('Invalid API response');
         }
-      } catch (error) {
-        console.error('❌ Error fetching categories for /categories page:', error);
+      } catch (err) {
+        console.error('❌ Error fetching categories for /categories page:', err);
         setError('Failed to load categories');
         
         // Fallback to default categories if API fails
-        const defaultCategories = [
-          { name: 'ACCESSORIES', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop&crop=center' },
-          { name: 'BAGS', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop&crop=center' },
-          { name: 'FURNITURE', image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop&crop=center' },
-          { name: 'GIFTS', image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop&crop=center' },
+        const defaultCategories: ProductCategory[] = [
+          { id: '1', name: 'ACCESSORIES', slug: 'accessories', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop&crop=center' },
+          { id: '2', name: 'BAGS', slug: 'bags', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop&crop=center' },
+          { id: '3', name: 'FURNITURE', slug: 'furniture', image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop&crop=center' },
+          { id: '4', name: 'GIFTS', slug: 'gifts', image: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=400&fit=crop&crop=center' },
         ];
         console.log('🔄 Categories page using fallback categories:', defaultCategories.length);
         setCategories(defaultCategories);

@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Swiper, SwiperSlide, type SwiperRef } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import { apiClient } from '@/lib/api';
+import { BackendCategory } from '@/types';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -158,7 +159,7 @@ const CategoriesSection = memo(() => {
         
         if (response && response.success && response.data && response.data.length > 0) {
           // Transform backend categories to match frontend format
-          const transformedCategories = response.data.map((category: any) => ({
+          const transformedCategories = response.data.map((category: BackendCategory) => ({
             name: category.name.toUpperCase(),
             image: category.image || defaultCategoryImages[category.name.toLowerCase()] || 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop&crop=center',
             slug: category.name.toLowerCase().replace(/\s+/g, '-'), // Generate slug from name
@@ -166,14 +167,14 @@ const CategoriesSection = memo(() => {
           }));
           
           console.log('✅ Successfully loaded', transformedCategories.length, 'categories from API');
-          console.log('📋 Categories:', transformedCategories.map(c => c.name));
+          console.log('📋 Categories:', transformedCategories.map((c: BackendCategory) => c.name));
           setCategories(transformedCategories);
         } else {
           console.log('❌ API response invalid or empty:', response);
           throw new Error('Invalid API response');
         }
-      } catch (error) {
-        console.error('❌ Error fetching categories:', error);
+        } catch {
+          // console.error('❌ Error fetching categories:', err);
         setError('Failed to load categories');
         
         // Use hardcoded categories as fallback

@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Eye, Heart, Sparkles, Gem, Gift, Users, Play } from "lucide-react";
-import { FadeIn, StaggeredFadeIn } from "@/components/animations";
+import { Eye, Sparkles, Gem, Gift, Users, Play } from "lucide-react";
 import { apiClient } from '@/lib/api';
 import { wsClient } from '@/lib/websocket';
 
@@ -79,7 +78,7 @@ export default function LivestreamSectionIntegrated() {
       wsClient.connect(token);
       
       // Listen for stream updates
-      wsClient.onStreamStats((stats) => {
+      wsClient.onStreamStats((stats: any) => {
         setLivestreams(prev => prev.map(stream => 
           stream.id === stats.streamId 
             ? { ...stream, viewers: stats.viewerCount }
@@ -88,7 +87,7 @@ export default function LivestreamSectionIntegrated() {
       });
 
       // Listen for chat messages
-      wsClient.onStreamChatMessage((message) => {
+      wsClient.onStreamChatMessage((message: any) => {
         setLivestreams(prev => prev.map(stream => {
           if (stream.id === message.streamId) {
             return {
