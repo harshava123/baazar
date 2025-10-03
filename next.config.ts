@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NODE_ENV === 'production' 
       ? 'http://bazarapi.elitceler.com/api'
       : 'http://localhost:5000/api',
+    NEXT_PUBLIC_WS_URL: process.env.NODE_ENV === 'production'
+      ? 'http://bazarapi.elitceler.com'
+      : 'http://localhost:5000',
   },
   images: {
     remotePatterns: [
@@ -31,6 +34,19 @@ const nextConfig: NextConfig = {
         hostname: 'bazarapi.elitceler.com',
         port: '',
         pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'bazarapi.elitceler.com',
+        port: '',
+        pathname: '/uploads/**',
+      },
+    ],
+  },
+};
+
+export default nextConfig;
+
       },
       {
         protocol: 'https',

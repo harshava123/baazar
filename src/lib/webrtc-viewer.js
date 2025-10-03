@@ -35,7 +35,7 @@ class WebRTCViewer {
 
       this.socket.on('connect_error', (error) => {
         console.error('❌ WebRTC Viewer connection error:', error);
-        console.error('Make sure the backend server is running on port 5000');
+        console.error('Make sure the backend server is running and accessible');
         reject(error);
       });
 
@@ -218,6 +218,10 @@ class WebRTCViewer {
     if (this.socket) {
       this.socket.disconnect();
     }
+  }
+}
+
+export default WebRTCViewer;
   }
 }
 
