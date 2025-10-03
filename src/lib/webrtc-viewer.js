@@ -222,7 +222,3 @@ class WebRTCViewer {
 }
 
 export default WebRTCViewer;
-  }
-}
-
-export default WebRTCViewer;

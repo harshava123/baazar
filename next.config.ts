@@ -46,16 +46,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-      },
-      {
-        protocol: 'https',
-        hostname: 'bazarapi.elitceler.com',
-        port: '',
-        pathname: '/uploads/**',
-      },
-    ],
-  },
-};
-
-export default nextConfig;
