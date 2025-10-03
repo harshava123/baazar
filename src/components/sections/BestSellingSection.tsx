@@ -34,7 +34,13 @@ const BestSellingSection = memo(() => {
             id: product.id,
             name: product.name,
             price: product.price,
-            image: product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop&crop=center',
+            image: (() => {
+              const imageUrl = product.images && product.images.length > 0 && product.images[0] ? product.images[0] : null;
+              if (!imageUrl || imageUrl.includes('undefined')) {
+                return 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&fit=crop&crop=center';
+              }
+              return imageUrl;
+            })(),
             category: {
               id: product.categories?.id || '1',
               name: product.categories?.name || 'General',

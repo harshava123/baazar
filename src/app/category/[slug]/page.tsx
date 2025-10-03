@@ -466,7 +466,7 @@ const CategoryPage = memo(({ params }: CategoryPageProps) => {
     id: product.id,
     name: product.name,
     price: product.discount_price || product.price,
-    image: product.images && product.images.length > 0 ? product.images[0] : '/individual-category/1.png'
+    image: product.images && product.images.length > 0 && product.images[0] ? product.images[0] : '/individual-category/1.png'
   }));
 
   return (

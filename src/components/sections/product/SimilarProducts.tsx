@@ -133,7 +133,7 @@ const SimilarProducts = ({ categoryId, categoryName, currentProductId }: Similar
             <Link href={`/product/${product.id}`}>
               <div className="relative bg-gray-100 overflow-hidden aspect-square">
                 <Image
-                  src={product.images && product.images.length > 0 ? product.images[0] : '/individual-category/1.png'}
+                  src={product.images && product.images.length > 0 && product.images[0] ? product.images[0] : '/individual-category/1.png'}
                   alt={product.name}
                   fill
                   className="object-cover object-center transition-all duration-500 group-hover:scale-105"

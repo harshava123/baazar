@@ -95,7 +95,7 @@ const ProductInfo = ({
       name: product.name,
       price: product.discount_price || product.price,
       originalPrice: product.price, // Store original price for discount calculation
-      image: product.images && product.images.length > 0 ? product.images[0] : '/individual-category/1.png',
+      image: product.images && product.images.length > 0 && product.images[0] ? product.images[0] : '/individual-category/1.png',
       quantity: quantity,
       selectedSize: selectedSize,
       selectedColor: selectedColor
@@ -113,7 +113,7 @@ const ProductInfo = ({
       name: product.name,
       price: product.discount_price || product.price,
       originalPrice: product.price, // Store original price for discount calculation
-      image: product.images && product.images.length > 0 ? product.images[0] : '/individual-category/1.png',
+      image: product.images && product.images.length > 0 && product.images[0] ? product.images[0] : '/individual-category/1.png',
       quantity: quantity,
       selectedSize: selectedSize,
       selectedColor: selectedColor
