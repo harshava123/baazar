@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NODE_ENV === 'production' 
+      ? 'http://bazarapi.elitceler.com/api'
+      : 'http://localhost:5000/api',
+  },
   images: {
     remotePatterns: [
       {
@@ -21,13 +26,18 @@ const nextConfig: NextConfig = {
         port: '5000',
         pathname: '/uploads/**',
       },
-      // Production configuration - update with your actual domain
-      ...(process.env.NODE_ENV === 'production' ? [{
-        protocol: 'https' as const,
-        hostname: 'your-production-domain.com',
+      {
+        protocol: 'http',
+        hostname: 'bazarapi.elitceler.com',
         port: '',
         pathname: '/uploads/**',
-      }] : []),
+      },
+      {
+        protocol: 'https',
+        hostname: 'bazarapi.elitceler.com',
+        port: '',
+        pathname: '/uploads/**',
+      },
     ],
   },
 };
