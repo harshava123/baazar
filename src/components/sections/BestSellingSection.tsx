@@ -25,7 +25,7 @@ const BestSellingSection = memo(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.getProducts({ featured: 'true', limit: '10' });
+        const response = await apiClient.getProducts({ limit: '10' });
         
         if (response.success && response.data) {
           // Transform backend products to match frontend format

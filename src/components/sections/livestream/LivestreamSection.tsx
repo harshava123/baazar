@@ -171,10 +171,10 @@ export default function LivestreamSectionIntegrated() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-            Live Shopping
+            Trullu Live Shopping
           </h1>
           <p className="text-gray-400 text-lg">
-            Watch live streams and shop with your favorite vendors
+            Watch live streams and shop with your favorite vendors on Trullu
           </p>
         </div>
 
@@ -202,7 +202,7 @@ export default function LivestreamSectionIntegrated() {
                     <div className="absolute top-4 left-4 flex items-center gap-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                       <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                        LIVE
+                        TRULLU LIVE
                       </span>
                     </div>
                   )}
@@ -232,7 +232,7 @@ export default function LivestreamSectionIntegrated() {
                       {getIconComponent(stream.icon)}
                     </div>
                     <span className="text-green-400 text-sm font-medium">
-                      {stream.category}
+                      Trullu Live Shopping
                     </span>
                   </div>
 
@@ -322,68 +322,32 @@ export default function LivestreamSectionIntegrated() {
           </div>
         )}
 
-        {/* Video Modal */}
+        {/* Video Modal - YouTube Style Layout */}
         {showVideoModal && selectedStream && (
-          <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-6xl bg-gray-900 rounded-2xl overflow-hidden">
-              {/* Video Player */}
-              <div className="relative aspect-video bg-black">
-                {selectedStream.hls_url ? (
-                  <video
-                    controls
-                    autoPlay
-                    className="w-full h-full"
-                    src={selectedStream.hls_url}
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <Play className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                      <p className="text-gray-400">Stream not available</p>
+          <div className="fixed inset-0 bg-black z-50 flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 bg-gray-900 border-b border-gray-700">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
+                  <span className="text-sm font-medium text-white">
+                    {selectedStream.streamerName.charAt(0)}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">{selectedStream.title}</h3>
+                  <div className="flex items-center gap-4 text-sm text-gray-400">
+                    <span>{selectedStream.streamerName}</span>
+                    <div className="flex items-center gap-2 text-red-400">
+                      <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                      <span>TRULLU LIVE</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      <span>{formatViewerCount(selectedStream.viewers)} viewers</span>
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* Stream Info */}
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">{selectedStream.title}</h2>
-                    <p className="text-gray-400">by {selectedStream.streamerName}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-gray-400" />
-                    <span className="text-gray-400">
-                      {formatViewerCount(selectedStream.viewers)} viewers
-                    </span>
-                  </div>
-                </div>
-
-                {/* Comments Section */}
-                <div className="border-t border-gray-700 pt-4">
-                  <h3 className="text-lg font-bold mb-4">Live Chat</h3>
-                  <div className="space-y-3 max-h-48 overflow-y-auto">
-                    {selectedStream.comments.map((comment) => (
-                      <div key={comment.id} className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-sm">
-                            {comment.username.charAt(0)}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">{comment.username}</p>
-                          <p className="text-gray-300">{comment.message}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
-
-              {/* Close Button */}
               <button
                 onClick={() => {
                   setShowVideoModal(false);
@@ -392,10 +356,122 @@ export default function LivestreamSectionIntegrated() {
                     leaveStream(selectedStream.id);
                   }
                 }}
-                className="absolute top-4 right-4 w-10 h-10 bg-black bg-opacity-50 hover:bg-opacity-70 rounded-full flex items-center justify-center transition-colors"
+                className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors text-white"
               >
-                <span className="text-white text-xl">×</span>
+                ×
               </button>
+            </div>
+
+            {/* Main Content - YouTube Style */}
+            <div className="flex-1 flex overflow-hidden">
+              {/* Left Side - Video Player */}
+              <div className="flex-1 bg-black flex items-center justify-center">
+                <div className="w-full h-full relative">
+                  {selectedStream.hls_url ? (
+                    <video
+                      controls
+                      autoPlay
+                      className="w-full h-full"
+                      src={selectedStream.hls_url}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <Play className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                        <p className="text-gray-400">Stream not available</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Side - Comments Section */}
+              <div className="w-96 bg-gray-900 border-l border-gray-700 flex flex-col">
+                {/* Comments Header */}
+                <div className="p-4 border-b border-gray-700">
+                  <h4 className="text-lg font-semibold text-white mb-2">Live Chat</h4>
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                    <span>{formatViewerCount(selectedStream.viewers)} viewers watching</span>
+                  </div>
+                </div>
+
+                {/* Comments List */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {selectedStream.comments.map((comment) => (
+                    <div key={comment.id} className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-sm font-semibold">
+                          {comment.username.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-semibold text-white">{comment.username}</span>
+                          <span className="text-xs text-gray-400">now</span>
+                        </div>
+                        <p className="text-sm text-gray-300 break-words">{comment.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* Sample Comments for Demo */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-semibold">R</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-semibold text-white">Rahul</span>
+                        <span className="text-xs text-gray-400">2m ago</span>
+                      </div>
+                      <p className="text-sm text-gray-300">Great products! How much is this?</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-semibold">N</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-semibold text-white">Nithin</span>
+                        <span className="text-xs text-gray-400">5m ago</span>
+                      </div>
+                      <p className="text-sm text-gray-300">Interested in the jewelry collection!</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-semibold">S</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-semibold text-white">Sarah</span>
+                        <span className="text-xs text-gray-400">8m ago</span>
+                      </div>
+                      <p className="text-sm text-gray-300">Love the quality! Do you have more colors?</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Comment Input */}
+                <div className="p-4 border-t border-gray-700">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add a comment..."
+                      className="flex-1 bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-green-500 focus:outline-none text-sm"
+                    />
+                    <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

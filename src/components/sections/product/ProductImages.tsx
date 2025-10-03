@@ -1,21 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Heart } from 'lucide-react';
 
-const ProductImages = () => {
+interface ProductImagesProps {
+  images: string[];
+  colors: string[];
+  selectedColor: string;
+}
+
+const ProductImages = ({ images, colors, selectedColor }: ProductImagesProps) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Sample product images - in a real app, these would come from the product data
-  const images = [
-    '/products/product1.png',
-    '/products/product1Side.png',
-    '/products/product1Side2.png',
-    '/products/product1Side3.png'
-  ];
+  // When color changes, switch to the corresponding image
+  // Images map to colors in order: image[0] -> color[0], image[1] -> color[1], etc.
+  useEffect(() => {
+    if (colors.length > 0 && selectedColor) {
+      const colorIndex = colors.indexOf(selectedColor);
+      if (colorIndex !== -1 && colorIndex < images.length) {
+        setSelectedImage(colorIndex);
+      }
+    }
+  }, [selectedColor, colors, images]);
 
   const toggleWishlist = () => {
     setIsWishlisted(!isWishlisted);

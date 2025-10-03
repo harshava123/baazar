@@ -1,10 +1,11 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { apiClient } from '@/lib/api';
 
 
 // Static product data for demonstration
@@ -72,6 +73,16 @@ const categoryConfig = {
     ]
   },
   clothing: {
+    title: "APPAREL",
+    heroImage: "/categories/clothing.png",
+    sections: [
+      { id: "apparel-for-all", title: "APPAREL FOR ALL", products: sneakerProducts["sneakers-for-all"] },
+      { id: "trending", title: "TRENDING OF THE WEEK", products: sneakerProducts["trending"] },
+      { id: "new-arrivals", title: "NEW ARRIVALS", products: sneakerProducts["new-arrivals"], specialLayout: true },
+      { id: "best-rated", title: "BEST RATED", products: sneakerProducts["best-rated"] },
+    ]
+  },
+  apparel: {
     title: "APPAREL",
     heroImage: "/categories/clothing.png",
     sections: [
@@ -376,13 +387,71 @@ interface CategoryPageProps {
 
 const CategoryPage = memo(({ params }: CategoryPageProps) => {
   const resolvedParams = use(params) as { slug: string };
-  const category = categoryConfig[resolvedParams.slug as keyof typeof categoryConfig];
+  
+  // Try to find category with flexible matching
+  let category = categoryConfig[resolvedParams.slug as keyof typeof categoryConfig];
+  
+  // If not found, try alternative slugs (e.g., "apparel" -> "clothing")
+  if (!category) {
+    const slugMap: Record<string, keyof typeof categoryConfig> = {
+      'clothing': 'apparel',
+      'apparel': 'clothing',
+    };
+    const alternativeSlug = slugMap[resolvedParams.slug];
+    if (alternativeSlug) {
+      category = categoryConfig[alternativeSlug];
+    }
+  }
+  
+  const [realProducts, setRealProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categoryName, setCategoryName] = useState<string>(category?.title || '');
+  
+  // Fetch real products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        // Get all categories to find the ID matching the slug
+        const categoriesResult = await apiClient.getCategories();
+        if (categoriesResult.success && categoriesResult.data) {
+          // Find category by name matching slug (case-insensitive, with various formats)
+          const matchedCategory = categoriesResult.data.find((cat: any) => {
+            const catNameSlug = cat.name.toLowerCase().replace(/\s+/g, '-');
+            const catNameSpaced = cat.name.toLowerCase();
+            const paramSlug = resolvedParams.slug.toLowerCase();
+            const paramSpaced = resolvedParams.slug.replace(/-/g, ' ').toLowerCase();
+            
+            return catNameSlug === paramSlug || 
+                   catNameSpaced === paramSpaced ||
+                   catNameSpaced === paramSlug ||
+                   catNameSlug === paramSpaced;
+          });
+          
+          if (matchedCategory) {
+            setCategoryName(matchedCategory.name.toUpperCase());
+            // Fetch products for this category
+            const productsResult = await apiClient.getProducts({ category: matchedCategory.id });
+            if (productsResult.success && productsResult.data) {
+              setRealProducts(productsResult.data);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProducts();
+  }, [resolvedParams.slug]);
   
   if (!category) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-white font-staatliches text-2xl mb-4">Category Not Found</h1>
+          <p className="text-white/60 mb-4">The category &quot;{resolvedParams.slug}&quot; could not be found.</p>
           <Link href="/categories" className="text-[#98FF98] hover:underline">
             Back to Categories
           </Link>
@@ -390,11 +459,17 @@ const CategoryPage = memo(({ params }: CategoryPageProps) => {
       </div>
     );
   }
+  
+  // Transform real products to match component interface
+  const transformedProducts = realProducts.map(product => ({
+    id: product.id,
+    name: product.name,
+    price: product.discount_price || product.price,
+    image: product.images && product.images.length > 0 ? product.images[0] : '/individual-category/1.png'
+  }));
 
   return (
     <div className="min-h-screen bg-black">
-
-
       {/* Main Content */}
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
         {/* Category Title */}
@@ -413,7 +488,7 @@ const CategoryPage = memo(({ params }: CategoryPageProps) => {
               letterSpacing: '0.2px'
             }}
           >
-            <span className="text-[#FF6F61]">{category.title}</span>
+            <span className="text-[#FF6F61]">{categoryName || category.title}</span>
           </h1>
         </motion.div>
 
@@ -503,14 +578,24 @@ const CategoryPage = memo(({ params }: CategoryPageProps) => {
         </motion.div>
 
         {/* Product Sections */}
-        {category.sections.map((section) => (
+        {loading ? (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 border-4 border-[#98FF98] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-white text-lg">Loading products...</p>
+          </div>
+        ) : transformedProducts.length > 0 ? (
           <ProductSection
-            key={section.id}
-            title={section.title}
-            products={section.products}
-            specialLayout={section.specialLayout}
+            key="real-products"
+            title={`${categoryName || category.title} PRODUCTS`}
+            products={transformedProducts}
+            specialLayout={false}
           />
-        ))}
+        ) : (
+          <div className="text-center py-16">
+            <p className="text-white/60 text-lg mb-4">No products available in this category yet.</p>
+            <p className="text-white/40">Check back soon for new arrivals!</p>
+          </div>
+        )}
       </div>
     </div>
   );

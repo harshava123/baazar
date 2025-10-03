@@ -7,6 +7,7 @@ export interface CartItem {
   id: string;
   name: string;
   price: number;
+  originalPrice?: number; // MRP/original price for discount calculation
   image: string;
   quantity: number;
   selectedSize?: string;

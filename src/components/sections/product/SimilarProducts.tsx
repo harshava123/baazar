@@ -1,62 +1,50 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { apiClient } from '@/lib/api';
 
-const SimilarProducts = () => {
-  const similarProducts = [
-    {
-      id: '1',
-      name: 'Pink Round Neck Striped Midi Dress',
-      price: 200,
-      image: '/products/similar1.png',
-      rating: 4.8,
-      reviews: 120
-    },
-    {
-      id: '2',
-      name: 'Printed Shoulder Straps High Slit Satin Dress',
-      price: 200,
-      image: '/products/similar2.png',
-      rating: 4.8,
-      reviews: 120
-    },
-    {
-      id: '3',
-      name: 'Pink Round Neck Striped Dress',
-      price: 200,
-      image: '/products/similar3.png',
-      rating: 4.8,
-      reviews: 120
-    },
-    {
-      id: '4',
-      name: 'AGPTEK Smart Watch for Women',
-      price: 200,
-      image: '/products/similar4.png',
-      rating: 4.8,
-      reviews: 120
-    },
-    {
-      id: '5',
-      name: 'Printed Shoulder Straps High Slit Satin Dress',
-      price: 200,
-      image: '/products/similar5.png',
-      rating: 4.8,
-      reviews: 120
-    },
-    {
-      id: '6',
-      name: 'Pink Round Neck Striped Dress',
-      price: 200,
-      image: '/products/similar6.png',
-      rating: 4.8,
-      reviews: 120
-    }
-  ];
+interface SimilarProductsProps {
+  categoryId?: string;
+  categoryName?: string;
+  currentProductId: string;
+}
+
+const SimilarProducts = ({ categoryId, categoryName, currentProductId }: SimilarProductsProps) => {
+  const [similarProducts, setSimilarProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSimilarProducts = async () => {
+      if (!categoryId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch products from the same category
+        const result = await apiClient.getProducts({ category: categoryId });
+        
+        if (result.success && result.data) {
+          // Filter out the current product and limit to 6
+          const filtered = result.data
+            .filter((product: any) => product.id !== currentProductId)
+            .slice(0, 6);
+          
+          setSimilarProducts(filtered);
+        }
+      } catch (error) {
+        console.error('Error fetching similar products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSimilarProducts();
+  }, [categoryId, currentProductId]);
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -94,6 +82,18 @@ const SimilarProducts = () => {
     return stars;
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="w-12 h-12 border-4 border-[#98FF98] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (similarProducts.length === 0) {
+    return null; // Don't show section if no similar products
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -104,20 +104,24 @@ const SimilarProducts = () => {
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-staatliches text-white">
-          SIMILAR
+          SIMILAR PRODUCTS
         </h2>
-        <motion.button
-          className="text-white hover:text-[#98FF98] transition-colors duration-200 text-sm sm:text-base"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          View All
-        </motion.button>
+        {categoryName && (
+          <Link href={`/category/${categoryName.toLowerCase().replace(/\s+/g, '-')}`}>
+            <motion.button
+              className="text-white hover:text-[#98FF98] transition-colors duration-200 text-sm sm:text-base"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              View All
+            </motion.button>
+          </Link>
+        )}
       </div>
 
       {/* Products Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
-        {similarProducts.map((product, index) => (
+        {similarProducts.map((product: any, index: number) => (
           <motion.div
             key={product.id}
             initial={{ opacity: 0, y: 20 }}
@@ -128,7 +132,7 @@ const SimilarProducts = () => {
             <Link href={`/product/${product.id}`}>
               <div className="relative bg-gray-100 overflow-hidden aspect-square">
                 <Image
-                  src={product.image}
+                  src={product.images && product.images.length > 0 ? product.images[0] : '/individual-category/1.png'}
                   alt={product.name}
                   fill
                   className="object-cover object-center transition-all duration-500 group-hover:scale-105"
@@ -147,18 +151,33 @@ const SimilarProducts = () => {
                   {product.name}
                 </h3>
 
-                <div className="text-sm sm:text-lg font-bold text-gray-900">
-                  ₹ {product.price.toLocaleString()}
+                <div className="space-y-1">
+                  {product.discount_price ? (
+                    <>
+                      <div className="text-sm sm:text-lg font-bold text-green-600">
+                        ₹ {product.discount_price.toLocaleString()}
+                      </div>
+                      <div className="text-xs sm:text-sm text-gray-500 line-through">
+                        ₹ {product.price.toLocaleString()}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-sm sm:text-lg font-bold text-gray-900">
+                      ₹ {product.price.toLocaleString()}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <div className="flex items-center gap-1">
-                    {renderStars(product.rating)}
+                {product.rating && (
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="flex items-center gap-1">
+                      {renderStars(product.rating)}
+                    </div>
+                    <span className="text-xs sm:text-sm text-gray-600">
+                      {product.rating.toFixed(1)} ({product.review_count || 0})
+                    </span>
                   </div>
-                  <span className="text-xs sm:text-sm text-gray-600">
-                    {product.rating.toFixed(1)} ({product.reviews})
-                  </span>
-                </div>
+                )}
               </div>
             </Link>
           </motion.div>

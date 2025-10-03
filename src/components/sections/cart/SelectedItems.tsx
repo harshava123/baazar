@@ -2,42 +2,42 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Minus, Plus, Trash2 } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 
 const SelectedItems = () => {
-  const { state, updateQuantity, removeFromCart } = useCart();
+  const { state, updateQuantity, removeFromCart, clearCart } = useCart();
   const { items } = state;
-
-  // Map product names to actual images from the products folder
-  const getProductImage = (productName: string) => {
-    const imageMap: { [key: string]: string } = {
-      'Pink Round Neck Striped Dress': '/products/product1.png',
-      'Blue Denim Jeans': '/products/jeans-1.svg',
-      'Leather Backpack': '/products/backpack-1.svg',
-      'Running Shoes': '/products/shoes-1.svg',
-      'Mechanical Keyboard': '/products/keyboard-1.svg',
-      'Table Fan': '/products/fan-1.svg',
-      'Summer Dress': '/products/dress-1.svg',
-    };
-    
-    return imageMap[productName] || '/products/product1.png';
-  };
 
   return (
     <div className="space-y-4">
-      {/* Title with same styling as BILLING DETAILS */}
-      <h2 
-        className="font-staatliches"
-        style={{
-          color: '#FAE5E5',
-          fontSize: 'clamp(28px, 6vw, 36px)',
-          lineHeight: '30px',
-          letterSpacing: '4%'
-        }}
-      >
-        SELECTED ITEMS
-      </h2>
+      {/* Title with Clear Cart Button */}
+      <div className="flex items-center justify-between">
+        <h2 
+          className="font-staatliches"
+          style={{
+            color: '#FAE5E5',
+            fontSize: 'clamp(28px, 6vw, 36px)',
+            lineHeight: '30px',
+            letterSpacing: '4%'
+          }}
+        >
+          SELECTED ITEMS
+        </h2>
+        {items.length > 0 && (
+          <button
+            onClick={() => {
+              if (confirm('Are you sure you want to clear your cart?')) {
+                clearCart();
+              }
+            }}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Clear Cart</span>
+          </button>
+        )}
+      </div>
       
       <div className="space-y-4">
         {items.map((item) => (
@@ -46,7 +46,7 @@ const SelectedItems = () => {
             <div className="flex-shrink-0">
               <div className="w-20 h-24 sm:w-24 sm:h-32 bg-gray-100 rounded-lg overflow-hidden">
                 <Image
-                  src={getProductImage(item.name)}
+                  src={item.image || '/individual-category/1.png'}
                   alt={item.name}
                   width={96}
                   height={128}
@@ -109,8 +109,10 @@ const SelectedItems = () => {
       </div>
 
       {items.length === 0 && (
-        <div className="text-center py-8 sm:py-12">
-          <p className="text-gray-500 text-base sm:text-lg">Your cart is empty</p>
+        <div className="text-center py-12 sm:py-16">
+          <ShoppingCart className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-500 text-base sm:text-lg mb-2">Your cart is empty</p>
+          <p className="text-gray-400 text-sm">Add some products to get started!</p>
         </div>
       )}
     </div>

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, ChevronDown, MapPin, Trash2, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useCart } from '@/contexts/CartContext';
 import AddAddressModal from './AddAddressModal';
 
 interface Address {
@@ -19,32 +20,38 @@ interface Address {
 
 const AddressLayout = () => {
   const router = useRouter();
+  const { state } = useCart();
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
-  const [savedAddresses, setSavedAddresses] = useState<Address[]>([
-    // Sample addresses for demonstration - in future, these will come from database
-    {
-      id: '1',
-      fullName: 'John Doe',
-      phoneNumber: '+91 98765 43210',
-      state: 'Maharashtra',
-      pincode: '400001',
-      apartmentDetails: 'Apartment 4B, Building A',
-      areaStreet: 'Marine Drive, Colaba',
-      isDefault: true
-    },
-    {
-      id: '2',
-      fullName: 'Jane Smith',
-      phoneNumber: '+91 87654 32109',
-      state: 'Delhi',
-      pincode: '110001',
-      apartmentDetails: 'Flat 12, Tower 3',
-      areaStreet: 'Connaught Place, New Delhi',
-      isDefault: false
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<string>('');
+
+  // Load addresses from localStorage on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('savedAddresses');
+    if (savedData) {
+      try {
+        const addresses = JSON.parse(savedData);
+        setSavedAddresses(addresses);
+        // Set first address as selected by default
+        const defaultAddress = addresses.find((addr: Address) => addr.isDefault);
+        if (defaultAddress) {
+          setSelectedAddress(defaultAddress.id);
+        } else if (addresses.length > 0) {
+          setSelectedAddress(addresses[0].id);
+        }
+      } catch (error) {
+        console.error('Error loading addresses:', error);
+      }
     }
-  ]);
-  const [selectedAddress, setSelectedAddress] = useState<string>('1'); // Default to first address
+  }, []);
+
+  // Save addresses to localStorage whenever they change
+  useEffect(() => {
+    if (savedAddresses.length > 0) {
+      localStorage.setItem('savedAddresses', JSON.stringify(savedAddresses));
+    }
+  }, [savedAddresses]);
 
   const handleSaveAddress = (addressData: Omit<Address, 'id'>) => {
     const newAddress: Address = {
@@ -73,6 +80,9 @@ const AddressLayout = () => {
       // If we deleted the selected address, select the first available one
       if (selectedAddress === addressId && updated.length > 0) {
         setSelectedAddress(updated[0].id);
+      } else if (updated.length === 0) {
+        setSelectedAddress('');
+        localStorage.removeItem('savedAddresses');
       }
       
       return updated;
@@ -142,7 +152,7 @@ const AddressLayout = () => {
           </motion.div>
 
           {/* Saved Addresses */}
-          {savedAddresses.length > 0 && (
+          {savedAddresses.length > 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -235,6 +245,17 @@ const AddressLayout = () => {
                 ))}
               </div>
             </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="bg-white/10 rounded-lg p-8 text-center"
+            >
+              <MapPin className="w-12 h-12 mx-auto mb-4 text-white/60" />
+              <h3 className="text-white text-lg font-medium mb-2">No Saved Addresses</h3>
+              <p className="text-white/60 text-sm">Add your first delivery address to continue</p>
+            </motion.div>
           )}
         </div>
 
@@ -253,34 +274,64 @@ const AddressLayout = () => {
             
             {/* Order Summary Content */}
             <div className="space-y-2 sm:space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">Subtotal</span>
-                <span className="font-medium text-sm sm:text-base">₹ 900</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">Discount (-20%)</span>
-                <span className="text-red-500 font-medium text-sm sm:text-base">-₹ 180</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">Delivery Fee</span>
-                <span className="font-medium text-sm sm:text-base">₹ 180</span>
-              </div>
-              <div className="border-t pt-2 sm:pt-3 flex justify-between">
-                <span className="font-bold text-base sm:text-lg">Total</span>
-                <span className="font-bold text-base sm:text-lg">₹ 900</span>
-              </div>
+              {(() => {
+                // Calculate subtotal from original prices
+                const originalSubtotal = state.items.reduce((sum, item) => {
+                  const originalPrice = item.originalPrice || item.price;
+                  return sum + (originalPrice * item.quantity);
+                }, 0);
+                
+                // Calculate discount
+                const discountedTotal = state.total;
+                const discount = originalSubtotal - discountedTotal;
+                const discountPercentage = originalSubtotal > 0 
+                  ? Math.round((discount / originalSubtotal) * 100) 
+                  : 0;
+                
+                return (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm sm:text-base">Subtotal</span>
+                      <span className="font-medium text-sm sm:text-base">₹ {originalSubtotal}</span>
+                    </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm sm:text-base">
+                          Discount (-{discountPercentage}%)
+                        </span>
+                        <span className="text-red-500 font-medium text-sm sm:text-base">-₹ {discount}</span>
+                      </div>
+                    )}
+                    <div className="border-t pt-2 sm:pt-3 flex justify-between">
+                      <span className="font-bold text-base sm:text-lg">Total</span>
+                      <span className="font-bold text-base sm:text-lg">₹ {discountedTotal}</span>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Continue to Payment Button */}
-            {selectedAddress && (
+            {state.items.length > 0 && (
               <motion.button
                 onClick={handleContinueToPayment}
-                className="w-full bg-[#98FF98] hover:bg-green-600 text-black py-3 px-4 rounded-lg font-semibold mt-4 sm:mt-6 transition-colors duration-200 text-sm sm:text-base"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                disabled={!selectedAddress}
+                className={`w-full py-3 px-4 rounded-lg font-semibold mt-4 sm:mt-6 transition-colors duration-200 text-sm sm:text-base ${
+                  selectedAddress
+                    ? 'bg-[#98FF98] hover:bg-green-600 text-black cursor-pointer'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+                whileHover={selectedAddress ? { scale: 1.02 } : {}}
+                whileTap={selectedAddress ? { scale: 0.98 } : {}}
               >
-                Continue to Payment
+                {selectedAddress ? 'Continue to Payment' : 'Select an Address'}
               </motion.button>
+            )}
+            
+            {state.items.length === 0 && (
+              <div className="mt-4 text-center text-gray-500 text-sm">
+                Your cart is empty
+              </div>
             )}
           </motion.div>
         </div>

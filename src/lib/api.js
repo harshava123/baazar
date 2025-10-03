@@ -147,6 +147,10 @@ class ApiClient {
     return this.request('/products/vendor/my-products');
   }
 
+  async getProductsByCategory(categoryId) {
+    return this.request(`/products?category=${categoryId}`, { includeAuth: false });
+  }
+
   // Category APIs
   async getCategories() {
     return this.request('/categories', { includeAuth: false });
@@ -316,6 +320,20 @@ class ApiClient {
     return this.request('/livestreams/vendor/my-streams');
   }
 
+  async getLivestreamsByProduct(productId) {
+    // Get all livestreams and filter by product_id on frontend
+    // since backend doesn't support product filtering yet
+    const allStreams = await this.request('/livestreams', { includeAuth: false });
+    if (allStreams.success && allStreams.data) {
+      const filteredStreams = allStreams.data.filter(stream => stream.product_id === productId);
+      return {
+        ...allStreams,
+        data: filteredStreams
+      };
+    }
+    return allStreams;
+  }
+
   // Health check
   async healthCheck() {
     return this.request('/health', { includeAuth: false });
@@ -338,6 +356,7 @@ export const {
   updateProduct,
   deleteProduct,
   getVendorProducts,
+  getProductsByCategory,
   getCategories,
   getCategory,
   createCategory,
@@ -359,5 +378,6 @@ export const {
   endLivestream,
   getLivestreamStats,
   getVendorLivestreams,
+  getLivestreamsByProduct,
   healthCheck,
 } = apiClient;

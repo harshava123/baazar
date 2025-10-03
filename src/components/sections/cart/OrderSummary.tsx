@@ -10,10 +10,22 @@ const OrderSummary = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { state } = useCart();
 
-  const subtotal = state.total;
-  const discount = Math.round(subtotal * 0.2); // 20% discount
-  const deliveryFee = subtotal > 0 ? 180 : 0;
-  const total = subtotal - discount + deliveryFee;
+  // Calculate subtotal from original prices
+  const originalSubtotal = state.items.reduce((sum, item) => {
+    const originalPrice = item.originalPrice || item.price;
+    return sum + (originalPrice * item.quantity);
+  }, 0);
+  
+  // Calculate discount (difference between original and discounted)
+  const discountedTotal = state.total;
+  const discount = originalSubtotal - discountedTotal;
+  
+  // Calculate discount percentage
+  const discountPercentage = originalSubtotal > 0 
+    ? Math.round((discount / originalSubtotal) * 100) 
+    : 0;
+  
+  const total = discountedTotal;
 
   return (
     <div className="bg-white rounded-lg p-4 sm:p-6 text-gray-900 shadow-sm border border-gray-100 mt-11 min-h-[400px]" style={{ fontFamily: 'Roboto' }}>
@@ -47,16 +59,16 @@ const OrderSummary = () => {
           <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
             <div className="flex justify-between">
               <span className="text-gray-600 text-sm sm:text-base">Subtotal</span>
-              <span className="font-medium text-sm sm:text-base">₹ {subtotal}</span>
+              <span className="font-medium text-sm sm:text-base">₹ {originalSubtotal}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600 text-sm sm:text-base">Discount (-20%)</span>
-              <span className="text-red-500 font-medium text-sm sm:text-base">-₹ {discount}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600 text-sm sm:text-base">Delivery Fee</span>
-              <span className="font-medium text-sm sm:text-base">₹ {deliveryFee}</span>
-            </div>
+            {discount > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600 text-sm sm:text-base">
+                  Discount (-{discountPercentage}%)
+                </span>
+                <span className="text-red-500 font-medium text-sm sm:text-base">-₹ {discount}</span>
+              </div>
+            )}
             <div className="border-t pt-3 sm:pt-4 flex justify-between">
               <span className="font-bold text-base sm:text-lg">Total</span>
               <span className="font-bold text-base sm:text-lg">₹ {total}</span>

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { apiClient } from '@/lib/api';
 import ProductImages from './ProductImages';
 import ProductInfo from './ProductInfo';
 import SimilarProducts from './SimilarProducts';
@@ -13,12 +14,37 @@ interface ProductDetailProps {
 }
 
 const ProductDetail = ({ productId }: ProductDetailProps) => {
-  // TODO: Use productId to fetch product data
-  console.log('Product ID:', productId);
   const router = useRouter();
-  const [selectedSize, setSelectedSize] = useState('L');
-  const [selectedColor, setSelectedColor] = useState('Black');
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
+
+  // Fetch product data
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const result = await apiClient.getProduct(productId);
+        if (result.success && result.data) {
+          setProduct(result.data);
+          // Set default selections
+          if (result.data.sizes && result.data.sizes.length > 0) {
+            setSelectedSize(result.data.sizes[0]);
+          }
+          if (result.data.colors && result.data.colors.length > 0) {
+            setSelectedColor(result.data.colors[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   const handleBack = () => {
     router.back();
@@ -29,6 +55,29 @@ const ProductDetail = ({ productId }: ProductDetailProps) => {
       setQuantity(newQuantity);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-16 h-16 border-4 border-[#98FF98] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-white text-lg">Product not found</p>
+        <motion.button
+          onClick={handleBack}
+          className="mt-4 text-[#98FF98] hover:underline"
+          whileHover={{ scale: 1.05 }}
+        >
+          Go Back
+        </motion.button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 sm:space-y-12">
@@ -46,10 +95,15 @@ const ProductDetail = ({ productId }: ProductDetailProps) => {
       {/* Main Product Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
         {/* Product Images */}
-        <ProductImages />
+        <ProductImages 
+          images={product.images || ['/individual-category/1.png']}
+          colors={product.colors || []}
+          selectedColor={selectedColor}
+        />
 
         {/* Product Information */}
         <ProductInfo
+          product={product}
           selectedSize={selectedSize}
           setSelectedSize={setSelectedSize}
           selectedColor={selectedColor}
@@ -60,7 +114,11 @@ const ProductDetail = ({ productId }: ProductDetailProps) => {
       </div>
 
       {/* Similar Products Section */}
-      <SimilarProducts />
+      <SimilarProducts 
+        categoryId={product.category_id} 
+        categoryName={product.categories?.name}
+        currentProductId={productId} 
+      />
     </div>
   );
 };

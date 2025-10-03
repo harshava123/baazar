@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronDown, CreditCard, DollarSign, Smartphone, Wallet, Tag, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, CreditCard, DollarSign, Smartphone, Wallet, Tag, ArrowRight, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/contexts/CartContext';
 import StandardBreadcrumbs from '@/components/sections/StandardBreadcrumbs';
 
 interface PaymentMethod {
@@ -14,8 +16,12 @@ interface PaymentMethod {
 }
 
 const PaymentLayout = () => {
+  const router = useRouter();
+  const { state, clearCart } = useCart();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('cash');
   const [promoCode, setPromoCode] = useState<string>('');
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const paymentMethods: PaymentMethod[] = [
     { id: 'bank', name: 'Bank', icon: CreditCard },
@@ -24,6 +30,18 @@ const PaymentLayout = () => {
     { id: 'wallet', name: 'Wallet', icon: Wallet }
   ];
 
+  // Calculate order summary from cart
+  const originalSubtotal = state.items.reduce((sum, item) => {
+    const originalPrice = item.originalPrice || item.price;
+    return sum + (originalPrice * item.quantity);
+  }, 0);
+
+  const discountedTotal = state.total;
+  const discount = originalSubtotal - discountedTotal;
+  const discountPercentage = originalSubtotal > 0 
+    ? Math.round((discount / originalSubtotal) * 100) 
+    : 0;
+
   const handlePaymentMethodChange = (methodId: string) => {
     setSelectedPaymentMethod(methodId);
   };
@@ -31,11 +49,42 @@ const PaymentLayout = () => {
   const handleApplyPromoCode = () => {
     // In future, this will validate and apply promo codes
     console.log('Applying promo code:', promoCode);
+    // You can add promo code validation logic here
   };
 
-  const handleCheckout = () => {
-    // In future, this will process the payment
-    console.log('Processing payment with method:', selectedPaymentMethod);
+  const handleCheckout = async () => {
+    if (state.items.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    // Simulate payment processing
+    setTimeout(() => {
+      // In future, this will send order to backend
+      const orderData = {
+        items: state.items,
+        paymentMethod: selectedPaymentMethod,
+        total: discountedTotal,
+        originalTotal: originalSubtotal,
+        discount: discount,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('Order placed:', orderData);
+
+      // Show success notification
+      setShowSuccessNotification(true);
+      setIsProcessing(false);
+
+      // Clear cart and redirect after 2 seconds
+      setTimeout(() => {
+        clearCart();
+        localStorage.removeItem('savedAddresses'); // Optional: clear addresses
+        router.push('/'); // Redirect to home
+      }, 2000);
+    }, 1500);
   };
 
   return (
@@ -159,22 +208,30 @@ const PaymentLayout = () => {
             
             {/* Order Summary Content */}
             <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">Subtotal</span>
-                <span className="font-medium text-sm sm:text-base">₹ 900</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">Discount (-20%)</span>
-                <span className="text-red-500 font-medium text-sm sm:text-base">-₹ 180</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600 text-sm sm:text-base">Delivery Fee</span>
-                <span className="font-medium text-sm sm:text-base">₹ 180</span>
-              </div>
-              <div className="border-t pt-2 sm:pt-3 flex justify-between">
-                <span className="font-bold text-base sm:text-lg">Total</span>
-                <span className="font-bold text-base sm:text-lg">₹ 900</span>
-              </div>
+              {state.items.length > 0 ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 text-sm sm:text-base">Subtotal</span>
+                    <span className="font-medium text-sm sm:text-base">₹ {originalSubtotal}</span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm sm:text-base">
+                        Discount (-{discountPercentage}%)
+                      </span>
+                      <span className="text-red-500 font-medium text-sm sm:text-base">-₹ {discount}</span>
+                    </div>
+                  )}
+                  <div className="border-t pt-2 sm:pt-3 flex justify-between">
+                    <span className="font-bold text-base sm:text-lg">Total</span>
+                    <span className="font-bold text-base sm:text-lg">₹ {discountedTotal}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  Your cart is empty
+                </div>
+              )}
             </div>
 
             {/* Promo Code Section */}
@@ -205,16 +262,48 @@ const PaymentLayout = () => {
             {/* Checkout Button */}
             <motion.button
               onClick={handleCheckout}
-              className="w-full bg-[#FF6F61] hover:bg-red-600 text-white py-3 px-4 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              disabled={state.items.length === 0 || isProcessing}
+              className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base ${
+                state.items.length === 0 || isProcessing
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-[#FF6F61] hover:bg-red-600 text-white'
+              }`}
+              whileHover={state.items.length > 0 && !isProcessing ? { scale: 1.02 } : {}}
+              whileTap={state.items.length > 0 && !isProcessing ? { scale: 0.98 } : {}}
             >
-              <span>Go to Checkout</span>
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              {isProcessing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <span>Place Order</span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                </>
+              )}
             </motion.button>
           </motion.div>
         </div>
       </div>
+
+      {/* Success Notification */}
+      <AnimatePresence>
+        {showSuccessNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 flex items-center gap-3"
+          >
+            <CheckCircle className="w-6 h-6" />
+            <div>
+              <p className="font-semibold text-lg">Order Placed Successfully!</p>
+              <p className="text-sm text-white/90">Redirecting to home...</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
