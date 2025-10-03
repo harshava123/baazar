@@ -394,7 +394,7 @@ export default function LivestreamSectionIntegrated() {
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
                       <Play className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                      <p className="text-gray-400">Connecting to WebRTC stream...</p>
+                      <p className="text-gray-400">Connecting to Live Shopping stream...</p>
                     </div>
                   </div>
                 )}
