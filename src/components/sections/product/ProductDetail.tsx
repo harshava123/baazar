@@ -28,6 +28,11 @@ const ProductDetail = ({ productId }: ProductDetailProps) => {
       try {
         const result = await apiClient.getProduct(productId);
         if (result.success && result.data) {
+          console.log('[UI] ProductDetail fetched product:', {
+            id: result.data.id,
+            images: result.data.images,
+            first: result.data?.images?.[0]
+          });
           setProduct(result.data);
           // Set default selections
           if (result.data.sizes && result.data.sizes.length > 0) {

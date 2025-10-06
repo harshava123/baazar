@@ -33,6 +33,12 @@ const ProductImages = ({ images, colors, selectedColor }: ProductImagesProps) =>
   const validImages = (images || [])
     .map((u) => normalizeUrl(u))
     .filter((u) => !!u);
+  if (typeof window !== 'undefined') {
+    try {
+      console.log('[UI] ProductImages received images:', images);
+      console.log('[UI] ProductImages valid images:', validImages);
+    } catch {}
+  }
 
   // When color changes, switch to the corresponding image
   // Images map to colors in order: image[0] -> color[0], image[1] -> color[1], etc.

@@ -116,11 +116,27 @@ class ApiClient {
     const endpoint = queryParams.toString() 
       ? `/products?${queryParams.toString()}`
       : '/products';
-    return this.request(endpoint, { includeAuth: false });
+    const res = await this.request(endpoint, { includeAuth: false });
+    try {
+      if (res && res.success && Array.isArray(res.data)) {
+        console.log('[API] getProducts sample images:', res.data.slice(0, 3).map(p => ({ id: p.id, first: p?.images?.[0] })));
+      } else {
+        console.log('[API] getProducts got', res);
+      }
+    } catch {}
+    return res;
   }
 
   async getProduct(id) {
-    return this.request(`/products/${id}`, { includeAuth: false });
+    const res = await this.request(`/products/${id}`, { includeAuth: false });
+    try {
+      if (res && res.success && res.data) {
+        console.log('[API] getProduct images:', { id, images: res.data.images, first: res.data?.images?.[0] });
+      } else {
+        console.log('[API] getProduct response (no data):', res);
+      }
+    } catch {}
+    return res;
   }
 
   async createProduct(productData) {
