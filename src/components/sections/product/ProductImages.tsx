@@ -15,12 +15,14 @@ const ProductImages = ({ images, colors, selectedColor }: ProductImagesProps) =>
   const [selectedImage, setSelectedImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const placeholder = '/products/placeholder.png';
+  const placeholder = '/livestream/placeholder.png';
 
   const normalizeUrl = (url?: string): string => {
     if (!url || typeof url !== 'string') return '';
     const trimmed = url.trim();
     if (!trimmed) return '';
+    // Drop obviously bad values
+    if (trimmed.endsWith('undefined') || trimmed.includes('/uploads/undefined')) return '';
     // Force https for bazarapi domain to avoid mixed content
     if (trimmed.startsWith('http://bazarapi.elitceler.com')) {
       return trimmed.replace('http://', 'https://');
