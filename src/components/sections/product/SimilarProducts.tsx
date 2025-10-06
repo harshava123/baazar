@@ -133,7 +133,12 @@ const SimilarProducts = ({ categoryId, categoryName, currentProductId }: Similar
             <Link href={`/product/${product.id}`}>
               <div className="relative bg-gray-100 overflow-hidden aspect-square">
                 <Image
-                  src={product.images && product.images.length > 0 && product.images[0] ? product.images[0] : '/individual-category/1.png'}
+                  src={(product.images || []).map((u:string)=>{
+                    if(!u||typeof u!== 'string') return '';
+                    const t=u.trim();
+                    if(!t||t.endsWith('undefined')||t.includes('/uploads/undefined')) return '';
+                    return t.startsWith('http://bazarapi.elitceler.com')? t.replace('http://','https://'): t;
+                  }).filter(Boolean)[0] || '/livestream/placeholder.png'}
                   alt={product.name}
                   fill
                   className="object-cover object-center transition-all duration-500 group-hover:scale-105"

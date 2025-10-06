@@ -30,6 +30,15 @@ const ProductInfo = ({
   const router = useRouter();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const sizes = product.sizes || [];
+  const normalizeUrl = (url?: string): string => {
+    if (!url || typeof url !== 'string') return '';
+    const t = url.trim();
+    if (!t || t.endsWith('undefined') || t.includes('/uploads/undefined')) return '';
+    if (t.startsWith('http://bazarapi.elitceler.com')) return t.replace('http://', 'https://');
+    return t;
+  };
+  const images = (product.images || []).map(normalizeUrl).filter(Boolean);
+  const primaryImage = images[0] || '/livestream/placeholder.png';
   
   // Map color names to visual colors
   const getColorClass = (colorName: string) => {
@@ -95,7 +104,7 @@ const ProductInfo = ({
       name: product.name,
       price: product.discount_price || product.price,
       originalPrice: product.price, // Store original price for discount calculation
-      image: product.images && product.images.length > 0 && product.images[0] ? product.images[0] : '/individual-category/1.png',
+      image: primaryImage,
       quantity: quantity,
       selectedSize: selectedSize,
       selectedColor: selectedColor
@@ -113,7 +122,7 @@ const ProductInfo = ({
       name: product.name,
       price: product.discount_price || product.price,
       originalPrice: product.price, // Store original price for discount calculation
-      image: product.images && product.images.length > 0 && product.images[0] ? product.images[0] : '/individual-category/1.png',
+      image: primaryImage,
       quantity: quantity,
       selectedSize: selectedSize,
       selectedColor: selectedColor

@@ -462,11 +462,19 @@ const CategoryPage = memo(({ params }: CategoryPageProps) => {
   }
   
   // Transform real products to match component interface
+  const normalizeUrl = (url?: string): string => {
+    if (!url || typeof url !== 'string') return '';
+    const t = url.trim();
+    if (!t || t.endsWith('undefined') || t.includes('/uploads/undefined')) return '';
+    if (t.startsWith('http://bazarapi.elitceler.com')) return t.replace('http://', 'https://');
+    return t;
+  };
+
   const transformedProducts = realProducts.map(product => ({
     id: product.id,
     name: product.name,
     price: product.discount_price || product.price,
-    image: product.images && product.images.length > 0 && product.images[0] ? product.images[0] : '/individual-category/1.png'
+    image: (product.images || []).map(normalizeUrl).filter(Boolean)[0] || '/livestream/placeholder.png'
   }));
 
   return (
